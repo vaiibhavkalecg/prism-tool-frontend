@@ -1,0 +1,56 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+  }
+
+  /* Add these styles to your dashboard.component.css file */
+
+/* Make the table container adapt to content */
+.table-responsive {
+  min-height: auto;
+  margin-bottom: 2rem;
+}
+
+/* Ensure the main container doesn't force extra space */
+.container-fluid {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make the table body take only the space it needs */
+tbody {
+  min-height: auto;
+}
+
+/* Add a fixed height to empty state if needed */
+.empty-state {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Optional: If you want a minimum height for the table when few items */
+.table-responsive table {
+  margin-bottom: 0;
+}
+
+/* Make sure content stretches but doesn't force whitespace */
+.py-4 {
+  padding-bottom: 1rem !important; /* Reduce bottom padding */
+}
+
+/* Make the footer stick to bottom if page content is short */
+footer, .footer {
+  margin-top: auto;
+}

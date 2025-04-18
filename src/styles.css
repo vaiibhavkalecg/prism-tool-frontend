@@ -13,3 +13,22 @@ body {
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
   transition: 0.3s;
 }
+
+::ng-deep .toast-success {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+
