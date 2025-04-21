@@ -343,7 +343,7 @@
 <div *ngFor="let chat of activeChats; let i = index" 
      class="chat-popup-container" 
      [ngClass]="{'d-none': chat.isMinimized}"
-     [ngStyle]="{'z-index': 1050 + chat.position, 'left': calculateChatPosition(i) + 'px'}">
+     [ngStyle]="{'z-index': 1050 + chat.position, 'right': 20 + (chat.position * 20) + 'px'}">
   <div class="chat-popup" [ngClass]="{'active-chat': chat.isActive}" (click)="setActiveChat(i)">
     <div class="chat-popup-header">
       <div class="d-flex align-items-center">

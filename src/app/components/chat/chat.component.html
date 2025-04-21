@@ -1,5 +1,5 @@
-<div class="chat-container d-flex flex-column vh-100">
-  <!-- Header -->
+<div class="chat-container d-flex flex-column" [ngClass]="{'vh-100': !popupMode}">
+  <!-- Header (hidden in popup mode via CSS) -->
   <div class="chat-header p-3 border-bottom">
     <div class="d-flex align-items-center">
       <div class="avatar-container me-3">
@@ -46,6 +46,14 @@
         autocomplete="off"
         autofocus
       />
+      <button 
+        class="btn btn-outline-secondary voice-button" 
+        type="button" 
+        (click)="toggleVoiceInput()"
+        [ngClass]="{'active': isListening}"
+        title="Voice input">
+        <i class="bi" [ngClass]="isListening ? 'bi-mic-fill' : 'bi-mic'"></i>
+      </button>
       <button class="btn btn-primary send-button" type="submit" [disabled]="!message.trim() || isLoading">
         <i class="bi bi-send-fill"></i>
       </button>

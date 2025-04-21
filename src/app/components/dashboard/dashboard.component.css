@@ -1,56 +1,139 @@
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1050;
-  }
+/* Existing dashboard styles */
 
-  /* Add these styles to your dashboard.component.css file */
-
-/* Make the table container adapt to content */
-.table-responsive {
-  min-height: auto;
-  margin-bottom: 2rem;
+/* Chat Popup Styles */
+.chat-popup-container {
+  position: fixed;
+  bottom: 80px; /* Increased to make room for minimized chats at bottom */
+  z-index: 1050;
+  width: 350px;
+  height: 450px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: #212529;
+  border: 1px solid #0d6efd;
+  transition: all 0.3s ease;
 }
 
-/* Ensure the main container doesn't force extra space */
-.container-fluid {
-  min-height: 100vh;
+.chat-popup {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: all 0.2s ease;
+}
+
+.chat-popup.active-chat {
+  box-shadow: 0 0 0 2px #0d6efd;
+}
+
+.chat-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #212529;
+  border-bottom: 1px solid #0d6efd;
+  cursor: pointer;
+}
+
+.chat-popup-body {
+  flex: 1;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* Make the table body take only the space it needs */
-tbody {
-  min-height: auto;
-}
-
-/* Add a fixed height to empty state if needed */
-.empty-state {
-  min-height: 200px;
+.chat-popup-body app-chat {
   display: flex;
   flex-direction: column;
+  height: 100%;
+}
+
+/* Minimized Chat Styles */
+.minimized-chats-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  max-width: 90%;
+  flex-wrap: wrap;
+}
+
+.chat-minimized {
+  background-color: #212529;
+  border: 1px solid #0d6efd;
+  border-radius: 30px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  max-width: 250px;
+}
+
+.chat-minimized:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.chat-minimized .avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chat-minimized span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Avatar styles */
+.avatar-container {
+  width: 40px;
+  height: 40px;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Optional: If you want a minimum height for the table when few items */
-.table-responsive table {
-  margin-bottom: 0;
-}
-
-/* Make sure content stretches but doesn't force whitespace */
-.py-4 {
-  padding-bottom: 1rem !important; /* Reduce bottom padding */
-}
-
-/* Make the footer stick to bottom if page content is short */
-footer, .footer {
-  margin-top: auto;
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .chat-popup-container {
+    width: 90%;
+    height: 70%;
+    bottom: 80px;
+    left: 5% !important; /* Override inline styles */
+    right: auto !important;
+  }
+  
+  .minimized-chats-container {
+    bottom: 10px;
+    width: 100%;
+    padding: 0 10px;
+  }
+  
+  .chat-minimized {
+    max-width: 100%;
+    flex: 0 0 auto;
+  }
 }

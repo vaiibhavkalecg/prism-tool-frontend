@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { BotService } from '../../services/bot.service';
@@ -14,6 +14,15 @@ export class DashboardComponent {
 
   bots: any[] = [];
   showCreatePopup: boolean = false;
+  
+  // Chat popup properties
+  activeChats: Array<{
+    botId: string;
+    botName: string;
+    isMinimized: boolean;
+    isActive: boolean;
+    position: number;
+  }> = [];
 
   // Form fields
   isToolEnabled: boolean = false;
@@ -32,6 +41,13 @@ export class DashboardComponent {
   ngOnInit(): void {
     this.fetchBots();
     this.filteredBots = this.bots;
+  }
+
+  // Listen for window resize events to recalculate chat positions
+  @HostListener('window:resize')
+  onResize() {
+    // Force Angular change detection by triggering a state change
+    this.activeChats = [...this.activeChats];
   }
 
   openCreateBotPopup(): void {
@@ -150,6 +166,111 @@ export class DashboardComponent {
 
   refreshDashboard(): void {
     this.fetchBots();
+  }
+
+  // Chat popup methods
+  openChatPopup(botId: string): void {
+    // Check if chat is already open
+    const existingChatIndex = this.activeChats.findIndex(chat => chat.botId === botId);
+    
+    if (existingChatIndex !== -1) {
+      // Chat already exists, just restore it if minimized
+      this.activeChats[existingChatIndex].isMinimized = false;
+      this.activeChats[existingChatIndex].isActive = true;
+      
+      // Make this chat the active one
+      this.setActiveChat(existingChatIndex);
+      return;
+    }
+    
+    // Find the bot details
+    const bot = this.bots.find(b => b._id === botId);
+    const botName = bot ? bot.name : 'AI Assistant';
+    
+    // Add new chat
+    this.activeChats.push({
+      botId: botId,
+      botName: botName,
+      isMinimized: false,
+      isActive: true,
+      position: this.activeChats.length // Position for stacking
+    });
+    
+    // Set all other chats to inactive
+    this.setActiveChat(this.activeChats.length - 1);
+  }
+
+  closeChatPopup(index: number): void {
+    this.activeChats.splice(index, 1);
+    
+    // Update positions for remaining chats
+    this.activeChats.forEach((chat, idx) => {
+      chat.position = idx;
+    });
+  }
+
+  minimizeChatPopup(index: number): void {
+    this.activeChats[index].isMinimized = true;
+  }
+
+  restoreChatPopup(index: number): void {
+    this.activeChats[index].isMinimized = false;
+    this.setActiveChat(index);
+  }
+  
+  setActiveChat(index: number): void {
+    // Set all chats to inactive
+    this.activeChats.forEach(chat => chat.isActive = false);
+    
+    // Set the selected chat to active
+    this.activeChats[index].isActive = true;
+    
+    // Bring the active chat to the front by updating z-index via position
+    const currentPosition = this.activeChats[index].position;
+    const maxPosition = Math.max(...this.activeChats.map(chat => chat.position));
+    
+    if (currentPosition < maxPosition) {
+      // Update positions for all chats that were above this one
+      this.activeChats.forEach(chat => {
+        if (chat.position > currentPosition) {
+          chat.position--;
+        }
+      });
+      
+      // Move this chat to the top position
+      this.activeChats[index].position = maxPosition;
+    }
+  }
+
+  // Calculate the horizontal position for each chat window
+  calculateChatPosition(index: number): number {
+    const windowWidth = window.innerWidth;
+    const chatWidth = 350; // Width of chat popup
+    const spacing = 20; // Spacing between chats
+    const visibleChats = this.activeChats.filter(chat => !chat.isMinimized);
+    const visibleCount = visibleChats.length;
+    
+    // If there's only one chat or the window is too small, center it
+    if (visibleCount === 1 || windowWidth < (chatWidth * 2)) {
+      return (windowWidth / 2) - (chatWidth / 2);
+    }
+    
+    // Find the position of this chat in the visible chats array
+    const visibleIndex = visibleChats.findIndex(chat => chat === this.activeChats[index]);
+    
+    // Calculate total width needed for all chats
+    const totalWidth = (visibleCount * chatWidth) + ((visibleCount - 1) * spacing);
+    
+    // If all chats can fit on screen with spacing
+    if (totalWidth < windowWidth) {
+      const startX = (windowWidth - totalWidth) / 2;
+      return startX + (visibleIndex * (chatWidth + spacing));
+    } else {
+      // If not all chats can fit, distribute them evenly
+      const availableWidth = windowWidth - chatWidth;
+      const step = availableWidth / (visibleCount - 1);
+      return visibleIndex * step;
+    }
   }
 
 }

@@ -13,9 +13,8 @@ export class ChatService {
   constructor(private http: HttpClient) {}
 
   sendQuery(query: string, botId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/query/`, {
-      query,
-      bot_id: botId
+    return this.http.post(`${this.apiUrl}/query/${botId}/`, {
+      query
     });
   }
 }
