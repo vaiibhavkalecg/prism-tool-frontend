@@ -31,6 +31,7 @@ export class DashboardComponent {
 
   searchTerm: string = '';
   filteredBots: any[] = [];
+  viewMode: string = 'list'; // Default view mode is list
 
   constructor(
     private botService: BotService,
@@ -166,6 +167,10 @@ export class DashboardComponent {
 
   refreshDashboard(): void {
     this.fetchBots();
+  }
+
+  toggleViewMode(mode: string): void {
+    this.viewMode = mode;
   }
 
   // Chat popup methods
