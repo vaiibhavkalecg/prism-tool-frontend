@@ -52,6 +52,46 @@
   border-top-left-radius: 4px;
 }
 
+/* Download button styling */
+.download-btn {
+  background-color: #198754;
+  border-color: #198754;
+  transition: all 0.2s ease;
+}
+
+.download-btn:hover {
+  background-color: #157347;
+  border-color: #146c43;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Text-to-speech button styling */
+.tts-btn {
+  background-color: transparent;
+  border-color: #6c757d;
+  color: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.tts-btn:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.tts-btn i {
+  font-size: 0.9rem;
+}
+
+/* Message actions container */
+.message-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
 /* Loading indicator */
 .loading-bubble {
   padding: 15px 20px;

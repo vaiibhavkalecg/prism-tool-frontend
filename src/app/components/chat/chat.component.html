@@ -16,9 +16,19 @@
 
   <!-- Messages Area -->
   <div class="chat-box flex-grow-1 overflow-auto p-3">
-    <div *ngFor="let msg of messages" @fadeIn class="message-row" [ngClass]="{'justify-content-end': msg.sender === 'user'}">
+    <div *ngFor="let msg of messages; let i = index" @fadeIn class="message-row" [ngClass]="{'justify-content-end': msg.sender === 'user'}">
       <div class="message-bubble" [ngClass]="{'user-message': msg.sender === 'user', 'bot-message': msg.sender === 'bot'}">
         {{ msg.text }}
+        <div class="message-actions mt-2" *ngIf="msg.sender === 'bot'">
+          <div class="d-flex gap-2">
+            <button *ngIf="msg.downloadLink" class="btn btn-sm btn-primary download-btn" (click)="downloadFile(msg.downloadLink)">
+              <i class="bi bi-download me-1"></i> Download File
+            </button>
+            <button class="btn btn-sm btn-outline-light tts-btn" (click)="speakText(msg.text, i)" title="Listen to this message">
+              <i class="bi" [ngClass]="isSpeaking && currentSpeakingIndex === i ? 'bi-volume-up-fill' : 'bi-volume-up'"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     

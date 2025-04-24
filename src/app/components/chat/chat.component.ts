@@ -89,10 +89,14 @@ export class ChatComponent implements OnInit, OnChanges {
   @Input() botId!: string;
   @Input() popupMode: boolean = false;
   message: string = '';
-  messages: { sender: 'user' | 'bot', text: string }[] = [];
+  messages: { sender: 'user' | 'bot', text: string, downloadLink?: string }[] = [];
   isLoading: boolean = false;
   isListening: boolean = false;
+  isSpeaking: boolean = false;
+  currentSpeakingIndex: number = -1;
   speechRecognition: SpeechRecognition | null = null;
+  speechSynthesis: SpeechSynthesis | null = null;
+  speechUtterance: SpeechSynthesisUtterance | null = null;
 
   constructor(private route: ActivatedRoute, private chatService: ChatService, private ngZone: NgZone) {}
 
@@ -105,18 +109,21 @@ export class ChatComponent implements OnInit, OnChanges {
     
     // Initialize with a welcome message
     if (this.botId) {
-      this.messages.push({ sender: 'bot', text: 'Hello! How can I assist you today?' });
+      this.messages.push({ sender: 'bot', text: 'Hello! I am Steve, How can I assist you today?' });
     }
 
     // Initialize speech recognition if supported by the browser
     this.initSpeechRecognition();
+    
+    // Initialize speech synthesis
+    this.initSpeechSynthesis();
   }
   
   ngOnChanges(changes: SimpleChanges): void {
     // Reset messages when botId changes in popup mode
     if (changes['botId'] && !changes['botId'].firstChange && this.popupMode) {
       this.messages = [];
-      this.messages.push({ sender: 'bot', text: 'Hello! How can I assist you today?' });
+      this.messages.push({ sender: 'bot', text: 'Hello! I am Steve, How can I assist you today?' });
     }
   }
 
@@ -133,7 +140,22 @@ export class ChatComponent implements OnInit, OnChanges {
     this.chatService.sendQuery(userMessage, this.botId).subscribe({
       next: (res) => {
         const reply = res.response || 'No response';
-        this.messages.push({ sender: 'bot', text: reply });
+        
+        // Check if there's a download link in the response
+        if (res.download_link) {
+          // If there's a download link, add it to the message object
+          // Also remove the markdown link from the text if present
+          const cleanText = this.removeMarkdownLinks(reply);
+          this.messages.push({ 
+            sender: 'bot', 
+            text: cleanText, 
+            downloadLink: res.download_link 
+          });
+        } else {
+          // Regular message without download link
+          this.messages.push({ sender: 'bot', text: reply });
+        }
+        
         this.isLoading = false;
       },
       error: () => {
@@ -141,6 +163,17 @@ export class ChatComponent implements OnInit, OnChanges {
         this.isLoading = false;
       }
     });
+  }
+  
+  // Helper method to remove markdown links from text
+  removeMarkdownLinks(text: string): string {
+    // This regex matches markdown links in the format [text](url)
+    return text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  }
+  
+  // Method to handle download when button is clicked
+  downloadFile(url: string): void {
+    window.open(url, '_blank');
   }
 
   initSpeechRecognition() {
@@ -198,5 +231,64 @@ export class ChatComponent implements OnInit, OnChanges {
         console.error('Speech recognition error:', error);
       }
     }
+  }
+
+  // Initialize speech synthesis
+  initSpeechSynthesis() {
+    if ('speechSynthesis' in window) {
+      this.speechSynthesis = window.speechSynthesis;
+    }
+  }
+
+  // Method to speak text aloud
+  speakText(text: string, messageIndex: number = -1) {
+    if (!this.speechSynthesis) {
+      alert('Text-to-speech is not supported in your browser.');
+      return;
+    }
+
+    // If already speaking, stop it
+    if (this.isSpeaking) {
+      this.speechSynthesis.cancel();
+      this.isSpeaking = false;
+      this.currentSpeakingIndex = -1;
+      
+      // If clicking the same message that's currently speaking, just stop
+      if (messageIndex === this.currentSpeakingIndex) {
+        return;
+      }
+    }
+
+    // Create a new utterance
+    this.speechUtterance = new SpeechSynthesisUtterance(text);
+    this.speechUtterance.lang = 'en-US';
+    this.speechUtterance.rate = 1.0;
+    this.speechUtterance.pitch = 1.0;
+    
+    // Set event handlers
+    this.speechUtterance.onstart = () => {
+      this.ngZone.run(() => {
+        this.isSpeaking = true;
+        this.currentSpeakingIndex = messageIndex;
+      });
+    };
+    
+    this.speechUtterance.onend = () => {
+      this.ngZone.run(() => {
+        this.isSpeaking = false;
+        this.currentSpeakingIndex = -1;
+      });
+    };
+    
+    this.speechUtterance.onerror = (event) => {
+      console.error('Speech synthesis error:', event);
+      this.ngZone.run(() => {
+        this.isSpeaking = false;
+        this.currentSpeakingIndex = -1;
+      });
+    };
+    
+    // Speak the text
+    this.speechSynthesis.speak(this.speechUtterance);
   }
 }
