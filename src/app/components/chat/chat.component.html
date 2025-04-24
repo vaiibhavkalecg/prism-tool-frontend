@@ -1,0 +1,72 @@
+<div class="chat-container d-flex flex-column" [ngClass]="{'vh-100': !popupMode}">
+  <!-- Header (hidden in popup mode via CSS) -->
+  <div class="chat-header p-3 border-bottom">
+    <div class="d-flex align-items-center">
+      <div class="avatar-container me-3">
+        <div class="avatar bg-primary text-white">
+          <i class="bi bi-robot"></i>
+        </div>
+      </div>
+      <div>
+        <h5 class="mb-0">AI Assistant</h5>
+        <small class="text-muted">Online</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages Area -->
+  <div class="chat-box flex-grow-1 overflow-auto p-3">
+    <div *ngFor="let msg of messages; let i = index" @fadeIn class="message-row" [ngClass]="{'justify-content-end': msg.sender === 'user'}">
+      <div class="message-bubble" [ngClass]="{'user-message': msg.sender === 'user', 'bot-message': msg.sender === 'bot'}">
+        {{ msg.text }}
+        <div class="message-actions mt-2" *ngIf="msg.sender === 'bot'">
+          <div class="d-flex gap-2">
+            <button *ngIf="msg.downloadLink" class="btn btn-sm btn-primary download-btn" (click)="downloadFile(msg.downloadLink)">
+              <i class="bi bi-download me-1"></i> Download File
+            </button>
+            <button class="btn btn-sm btn-outline-light tts-btn" (click)="speakText(msg.text, i)" title="Listen to this message">
+              <i class="bi" [ngClass]="isSpeaking && currentSpeakingIndex === i ? 'bi-volume-up-fill' : 'bi-volume-up'"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" @fadeIn class="message-row">
+      <div class="message-bubble bot-message loading-bubble">
+        <div class="typing-indicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Input -->
+  <div class="chat-input p-3 border-top">
+    <form (submit)="sendMessage()" class="input-group">
+      <input 
+        type="text" 
+        [(ngModel)]="message" 
+        name="message" 
+        class="form-control" 
+        placeholder="Type your message..." 
+        autocomplete="off"
+        autofocus
+      />
+      <button 
+        class="btn btn-outline-secondary voice-button" 
+        type="button" 
+        (click)="toggleVoiceInput()"
+        [ngClass]="{'active': isListening}"
+        title="Voice input">
+        <i class="bi" [ngClass]="isListening ? 'bi-mic-fill' : 'bi-mic'"></i>
+      </button>
+      <button class="btn btn-primary send-button" type="submit" [disabled]="!message.trim() || isLoading">
+        <i class="bi bi-send-fill"></i>
+      </button>
+    </form>
+  </div>
+</div>

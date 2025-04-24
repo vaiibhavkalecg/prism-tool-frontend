@@ -1,0 +1,9 @@
+footer {
+    margin-top: auto;
+    font-size: 0.875rem;
+  }
+  
+  footer a:hover {
+    color: #0d6efd !important;
+    transition: color 0.3s ease;
+  }

@@ -1,41 +1,47 @@
 <div class="container-fluid vh-100 d-flex align-items-center justify-content-center bg-black">
-    <div class="row w-100 shadow-lg rounded-4 overflow-hidden" style="max-width: 1000px; min-height: 600px;">
-  
-      <!-- Left Side: Animation -->
-      <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center" style="background-color: #141414;">
-        <lottie-player 
-          src="https://assets10.lottiefiles.com/packages/lf20_jtbfg2nb.json"
-          background="transparent"
-          speed="1"
-          style="width: 100%; height: 100%;" 
-          loop 
-          autoplay>
-        </lottie-player>
-      </div>
-  
-      <!-- Right Side: Register Form -->
-      <div class="col-md-6 p-5" style="background-color: #1a1a1a;">
-        <h2 class="text-center text-success mb-4">Register for Prism Tool Access</h2>
-        <form>
-          <div class="mb-3">
-            <label class="form-label text-light">Full Name</label>
-            <input type="text" class="form-control bg-dark text-light border-success" placeholder="Your name">
-          </div>
-          <div class="mb-3">
-            <label class="form-label text-light">Email</label>
-            <input type="email" class="form-control bg-dark text-light border-success" placeholder="Enter email">
-          </div>
-          <div class="mb-3">
-            <label class="form-label text-light">Password</label>
-            <input type="password" class="form-control bg-dark text-light border-success" placeholder="Password">
-          </div>
-          <button type="submit" class="btn btn-success w-100 fw-bold shadow">Register</button>
-        </form>
-        <div class="text-center mt-3">
-          <a routerLink="/login" class="text-secondary">Already registered? <span class="text-success">Login</span></a>
-        </div>
-      </div>
-  
+  <div class="row w-100 shadow-lg rounded-4 overflow-hidden" style="max-width: 90%; min-height: 90%;">
+
+    <!-- Left Side: Animation -->
+    <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center" style="background-color: #141414;">
+      <dotlottie-player
+        src="https://lottie.host/3c20873d-16e9-4e8f-91e0-baebf6b4bb3d/LrOurRRF1J.lottie"
+        background="transparent"
+        speed="1"
+        style="width: 500px; height: 500px"
+        loop
+        autoplay
+      ></dotlottie-player>
     </div>
+
+    <!-- Right Side: Register Form -->
+    <div class="col-md-6 p-5" style="background-color: #1a1a1a;">
+      <h2 class="text-center text-success mb-4">Register for Prism Tool Access</h2>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label class="form-label text-light">Full Name</label>
+          <input type="text" formControlName="name" class="form-control bg-dark text-light border-success" placeholder="Your name">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-light">Email</label>
+          <input type="email" formControlName="email" class="form-control bg-dark text-light border-success" placeholder="Enter email">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-light">Password</label>
+          <input type="password" formControlName="password" class="form-control bg-dark text-light border-success" placeholder="Password">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-light">Gender</label>
+          <select formControlName="gender" class="form-control bg-dark text-light border-success">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-success w-100 fw-bold shadow">Register</button>
+      </form>
+      <div class="text-center mt-3">
+        <a routerLink="/login" class="text-secondary">Already registered? <span class="text-success">Login</span></a>
+      </div>
+    </div>
+
   </div>
-  
+</div>

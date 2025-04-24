@@ -119,18 +119,18 @@
     </div>
     <div class="col-md-6 d-flex justify-content-md-end mt-3 mt-md-0">
       <div class="btn-group">
-        <button type="button" class="btn btn-outline-secondary" [ngClass]="{'active': viewMode === 'list'}" (click)="toggleViewMode('list')">
+        <button type="button" class="btn btn-outline-secondary active">
           <i class="bi bi-list"></i>
         </button>
-        <button type="button" class="btn btn-outline-secondary" [ngClass]="{'active': viewMode === 'card'}" (click)="toggleViewMode('card')">
+        <button type="button" class="btn btn-outline-secondary">
           <i class="bi bi-grid"></i>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Bots Table View - shown when list view is active -->
-  <div class="table-responsive mb-3" *ngIf="viewMode === 'list'">
+  <!-- Bots Table View - replacing the card grid -->
+  <div class="table-responsive mb-3">
     <table class="table table-dark table-hover border-secondary">
       <thead class="table-dark border-bottom border-secondary">
         <tr>
@@ -183,52 +183,6 @@
     </table>
   </div>
 
-  <!-- Bots Card View - shown when card view is active -->
-  <div class="row" *ngIf="viewMode === 'card'">
-    <div class="col-md-4 mb-4" *ngFor="let bot of filteredBots; let i = index">
-      <div class="card bg-dark border border-secondary rounded-3 shadow-sm h-100">
-        <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center">
-          <span class="badge rounded-pill" [ngClass]="bot.isToolEnabled ? 'bg-success' : 'bg-secondary'">
-            {{ bot.isToolEnabled ? 'Tools Enabled' : 'Basic' }}
-          </span>
-          <small class="text-secondary">#{{ i + 1 }}</small>
-        </div>
-        <div class="card-body">
-          <div class="d-flex align-items-center mb-3">
-            <div class="bot-icon rounded-circle me-3 d-flex align-items-center justify-content-center" 
-                 [ngClass]="bot.isToolEnabled ? 'bg-primary bg-opacity-25' : 'bg-secondary bg-opacity-25'"
-                 style="width: 50px; height: 50px;">
-              <i class="bi" [ngClass]="bot.isToolEnabled ? 'bi-robot text-primary' : 'bi-cpu text-secondary'" style="font-size: 1.5rem;"></i>
-            </div>
-            <div>
-              <h5 class="mb-0 text-light">{{ bot.name }}</h5>
-              <small class="text-secondary">{{ bot.model }}</small>
-            </div>
-          </div>
-          <p class="text-secondary small mb-3">{{ bot.description }}</p>
-          <p class="text-secondary small mb-0">
-            <i class="bi bi-calendar-event me-2"></i>Created: {{ bot.created_at | date:'medium' }}
-          </p>
-        </div>
-        <div class="card-footer bg-dark border-top border-secondary">
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-sm btn-outline-primary" title="Open Bot" (click)="openChatPopup(bot._id)">
-              <i class="bi bi-chat-dots me-1"></i> Chat
-            </button>
-            <div>
-              <button class="btn btn-sm btn-outline-warning me-2" title="Edit Bot">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger" title="Delete Bot" (click)="deleteBot(bot._id)">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Empty State with AI-like styling -->
   <div class="text-center py-5" *ngIf="bots.length === 0">
     <div class="empty-state position-relative">
@@ -244,10 +198,11 @@
         <i class="bi bi-plus-lg me-2"></i>Create Bot
       </button>
     </div>
-  </div>  </div>
+  </div>
+
   <!-- CREATE BOT MODAL - AI-THEMED -->
   <div *ngIf="showCreatePopup" class="modal-overlay">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content bg-dark text-light border border-primary rounded-3 shadow-lg position-relative overflow-hidden">
         <!-- Neural network background pattern -->
         <div class="position-absolute" style="top: 0; right: 0; bottom: 0; left: 0; opacity: 0.05; pointer-events: none;">
@@ -382,12 +337,13 @@
       </div>
     </div>
   </div>
+</div>
 
 <!-- Chat Popups -->  
 <div *ngFor="let chat of activeChats; let i = index" 
      class="chat-popup-container" 
      [ngClass]="{'d-none': chat.isMinimized}"
-     [ngStyle]="{'z-index': 1050 + chat.position, 'left': calculateChatPosition(i) + 'px'}">
+     [ngStyle]="{'z-index': 1050 + chat.position, 'right': 20 + (chat.position * 20) + 'px'}">
   <div class="chat-popup" [ngClass]="{'active-chat': chat.isActive}" (click)="setActiveChat(i)">
     <div class="chat-popup-header">
       <div class="d-flex align-items-center">

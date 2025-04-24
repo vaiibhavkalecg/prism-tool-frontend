@@ -1,40 +1,39 @@
 <div class="container-fluid vh-100 d-flex align-items-center justify-content-center bg-black">
-    <div class="row w-100 shadow-lg rounded-4 overflow-hidden" style="max-width: 1000px; min-height: 600px;">
-  
-      <!-- Left Side: Lottie Animation -->
-      <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center" style="background-color: #141414;">
-        <lottie-player 
-          src="https://assets10.lottiefiles.com/packages/lf20_jtbfg2nb.json"
-          background="transparent"
-          speed="1"
-          style="width: 100%; height: 100%;" 
-          loop 
-          autoplay>
-        </lottie-player>
-      </div>
-  
-      <!-- Right Side: Login Form -->
-      <div class="col-md-6 p-5" style="background-color: #1a1a1a;">
-        <h2 class="text-center text-info mb-4">Login to Your Prism Tool</h2>
-        <form>
-          <div class="mb-3">
-            <label class="form-label text-light">Email address</label>
-            <input type="email" class="form-control bg-dark text-light border-info" placeholder="Enter email">
-          </div>
-          <div class="mb-3">
-            <label class="form-label text-light">Password</label>
-            <input type="password" class="form-control bg-dark text-light border-info" placeholder="Password">
-          </div>
-          <button type="submit" class="btn btn-info w-100 fw-bold shadow">Login</button>
-        </form>
-        <div class="mb-3 text-end">
-            <a routerLink="/forgot-password" class="text-info">Forgot Password?</a>
-        </div>
-        <div class="text-center mt-3">
-          <a routerLink="/register" class="text-secondary">Don't have an account? <span class="text-info">Register</span></a>
-        </div>
-      </div>
-  
+  <div class="row w-100 shadow-lg rounded-4 overflow-hidden" style="max-width: 90%; min-height: 90%;">
+
+    <!-- Left Side: Lottie Animation -->
+    <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center" style="background-color: #141414;">
+      <dotlottie-player
+        src="https://lottie.host/3c20873d-16e9-4e8f-91e0-baebf6b4bb3d/LrOurRRF1J.lottie"
+        background="transparent"
+        speed="1"
+        style="width: 500px; height: 500px"
+        loop
+        autoplay
+      ></dotlottie-player>
     </div>
+
+    <!-- Right Side: Login Form -->
+    <div class="col-md-6 p-5" style="background-color: #1a1a1a;">
+      <h2 class="text-center text-info mb-4">Login to Your Prism Tool</h2>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label class="form-label text-light">Email address</label>
+          <input type="email" formControlName="email" class="form-control bg-dark text-light border-info" placeholder="Enter email">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-light">Password</label>
+          <input type="password" formControlName="password" class="form-control bg-dark text-light border-info" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-info w-100 fw-bold shadow">Login</button>
+      </form>
+      <div class="mb-3 text-end">
+        <a routerLink="/forgot-password" class="text-info">Forgot Password?</a>
+      </div>
+      <div class="text-center mt-3">
+        <a routerLink="/register" class="text-secondary">Don't have an account? <span class="text-info">Register</span></a>
+      </div>
+    </div>
+
   </div>
-  
+</div>
