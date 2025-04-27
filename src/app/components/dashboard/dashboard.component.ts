@@ -14,6 +14,9 @@ export class DashboardComponent {
 
   bots: any[] = [];
   showCreatePopup: boolean = false;
+  showScriptPopup: boolean = false;
+  scriptCode: string = '';
+  scriptCopied: boolean = false;
   
   // Chat popup properties
   activeChats: Array<{
@@ -22,6 +25,7 @@ export class DashboardComponent {
     isMinimized: boolean;
     isActive: boolean;
     position: number;
+    voiceEnabled: boolean;
   }> = [];
 
   // Form fields
@@ -38,6 +42,12 @@ export class DashboardComponent {
     private authService: AuthService,
     private router: Router,
   ) {}
+
+  // For testing - opens script popup with dummy data
+  openDummyScriptPopup(): void {
+    const dummyBotId = 'dummy-' + Math.random().toString(36).substring(2, 10);
+    this.openScriptPopup(dummyBotId);
+  }
 
   ngOnInit(): void {
     this.fetchBots();
@@ -173,8 +183,89 @@ export class DashboardComponent {
     this.viewMode = mode;
   }
 
+  // Script popup methods
+  openScriptPopup(botId: string): void {
+    // Generate a unique ID for the script even if botId is undefined
+    const uniqueId = Math.random().toString(36).substring(2, 10);
+    
+    // Handle case where botId might be undefined or bot not found
+    let botName = 'AI Assistant';
+    let botIdToUse = botId || uniqueId;
+    
+    // Try to find the bot if botId is provided
+    if (botId && this.bots && this.bots.length > 0) {
+      const bot = this.bots.find(b => b._id === botId);
+      if (bot) {
+        botName = bot.name;
+      }
+    }
+    
+    // Generate a realistic-looking script tag with proper indentation
+    this.scriptCode = `<script 
+  src="https://cdn.aibot.network/embed/${uniqueId}.js" 
+  data-bot-id="${botIdToUse}" 
+  data-bot-name="${botName}" 
+  data-theme="dark" 
+  data-position="right" 
+  data-avatar="true"
+  data-auto-open="false"
+  data-remember-conversation="true"
+  async>
+</script>`;
+    
+    // Make sure to set this to true to show the popup
+    this.showScriptPopup = true;
+    this.scriptCopied = false;
+    
+    console.log('Script popup opened', this.showScriptPopup);
+  }
+
+  copyScriptToClipboard(): void {
+    if (this.scriptCode) {
+      navigator.clipboard.writeText(this.scriptCode).then(() => {
+        this.scriptCopied = true;
+        setTimeout(() => this.scriptCopied = false, 3000); // Reset after 3 seconds
+      }).catch(err => {
+        console.error('Failed to copy script to clipboard:', err);
+        // Fallback for browsers that don't support clipboard API
+        this.fallbackCopyTextToClipboard(this.scriptCode);
+      });
+    }
+  }
+
+  // Fallback method for copying text to clipboard
+  fallbackCopyTextToClipboard(text: string): void {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    
+    // Make the textarea out of viewport
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        this.scriptCopied = true;
+        setTimeout(() => this.scriptCopied = false, 3000); // Reset after 3 seconds
+      }
+    } catch (err) {
+      console.error('Fallback: Could not copy text: ', err);
+    }
+    
+    document.body.removeChild(textArea);
+  }
+
+  closeScriptPopup(): void {
+    this.showScriptPopup = false;
+    console.log('Script popup closed', this.showScriptPopup);
+  }
+
   // Chat popup methods
-  openChatPopup(botId: string): void {
+  openChatPopup(botId: string, voiceEnabled: boolean = false): void {
     // Check if chat is already open
     const existingChatIndex = this.activeChats.findIndex(chat => chat.botId === botId);
     
@@ -182,6 +273,9 @@ export class DashboardComponent {
       // Chat already exists, just restore it if minimized
       this.activeChats[existingChatIndex].isMinimized = false;
       this.activeChats[existingChatIndex].isActive = true;
+      
+      // Update voice enabled status if it was changed
+      this.activeChats[existingChatIndex].voiceEnabled = voiceEnabled;
       
       // Make this chat the active one
       this.setActiveChat(existingChatIndex);
@@ -198,7 +292,8 @@ export class DashboardComponent {
       botName: botName,
       isMinimized: false,
       isActive: true,
-      position: this.activeChats.length // Position for stacking
+      position: this.activeChats.length, // Position for stacking
+      voiceEnabled: voiceEnabled
     });
     
     // Set all other chats to inactive

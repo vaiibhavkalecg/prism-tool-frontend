@@ -159,6 +159,30 @@
   justify-content: center;
 }
 
+/* Code Container Styles */
+.code-container {
+  font-family: 'Courier New', monospace;
+  position: relative;
+  border: 1px solid #0dcaf0;
+  transition: all 0.2s ease;
+}
+
+.code-container:hover {
+  border-color: #0dcaf0;
+  box-shadow: 0 0 10px rgba(13, 202, 240, 0.3);
+}
+
+.code-container pre {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.code-container code {
+  color: #0dcaf0;
+}
+
 /* Responsive adjustments */
 @media (max-width: 576px) {
   .chat-popup-container {
@@ -178,5 +202,10 @@
   .chat-minimized {
     max-width: 100%;
     flex: 0 0 auto;
+  }
+  
+  .modal-dialog {
+    width: 95%;
+    margin: 10px auto;
   }
 }

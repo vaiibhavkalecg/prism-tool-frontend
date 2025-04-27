@@ -23,6 +23,9 @@
         <button class="btn btn-outline-secondary me-2" title="Refresh" (click)="refreshDashboard()">
           <i class="bi bi-arrow-clockwise"></i>
         </button>
+        <button class="btn btn-outline-info me-2" title="Get Script" (click)="openDummyScriptPopup()">
+          <i class="bi bi-code-slash"></i>
+        </button>
         <button class="btn btn-primary me-2" title="Create Bot" (click)="openCreateBotPopup()">
           <i class="bi bi-plus-lg"></i>
         </button>
@@ -148,9 +151,9 @@
           <td>
             <div class="d-flex align-items-center">
               <div class="bot-icon rounded-circle me-3 d-flex align-items-center justify-content-center" 
-                   [ngClass]="bot.isToolEnabled ? 'bg-primary bg-opacity-25' : 'bg-secondary bg-opacity-25'"
+                   [ngClass]="{'bg-primary bg-opacity-25': bot.isToolEnabled, 'bg-secondary bg-opacity-25': !bot.isToolEnabled}"
                    style="width: 40px; height: 40px;">
-                <i class="bi" [ngClass]="bot.isToolEnabled ? 'bi-robot text-primary' : 'bi-cpu text-secondary'"></i>
+                <i class="bi" [ngClass]="{'bi-robot text-primary': bot.isToolEnabled, 'bi-cpu text-secondary': !bot.isToolEnabled}"></i>
               </div>
               <div>
                 <h6 class="mb-0 text-light">{{ bot.name }}</h6>
@@ -161,14 +164,21 @@
           <td>{{ bot.model }}</td>
           <td>{{ bot.created_at | date:'medium' }}</td>
           <td>
-            <span class="badge rounded-pill" [ngClass]="bot.isToolEnabled ? 'bg-success' : 'bg-secondary'">
-              {{ bot.isToolEnabled ? 'Tools Enabled' : 'Basic' }}
+            <span class="badge rounded-pill" [ngClass]="{'bg-success': bot.isToolEnabled, 'bg-secondary': !bot.isToolEnabled}">
+              <span *ngIf="bot.isToolEnabled">Tools Enabled</span>
+              <span *ngIf="!bot.isToolEnabled">Basic</span>
             </span>
           </td>
           <td>
             <div class="d-flex">
-              <button class="btn btn-sm btn-outline-primary me-2" title="Open Bot" (click)="openChatPopup(bot._id)">
+              <button class="btn btn-sm btn-outline-primary me-2" title="Open Bot" (click)="openChatPopup(bot._id, false)">
                 <i class="bi bi-chat-dots"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-primary me-2" title="Open Bot with Voice" (click)="openChatPopup(bot._id, true)">
+                <i class="bi bi-volume-up"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-info me-2" title="Get Embed Script" (click)="openScriptPopup(bot._id)">
+                <i class="bi bi-code-slash"></i>
               </button>
               <button class="btn btn-sm btn-outline-warning me-2" title="Edit Bot">
                 <i class="bi bi-pencil"></i>
@@ -188,17 +198,18 @@
     <div class="col-md-4 mb-4" *ngFor="let bot of filteredBots; let i = index">
       <div class="card bg-dark border border-secondary rounded-3 shadow-sm h-100">
         <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center">
-          <span class="badge rounded-pill" [ngClass]="bot.isToolEnabled ? 'bg-success' : 'bg-secondary'">
-            {{ bot.isToolEnabled ? 'Tools Enabled' : 'Basic' }}
+          <span class="badge rounded-pill" [ngClass]="{'bg-success': bot.isToolEnabled, 'bg-secondary': !bot.isToolEnabled}">
+            <span *ngIf="bot.isToolEnabled">Tools Enabled</span>
+            <span *ngIf="!bot.isToolEnabled">Basic</span>
           </span>
           <small class="text-secondary">#{{ i + 1 }}</small>
         </div>
         <div class="card-body">
           <div class="d-flex align-items-center mb-3">
             <div class="bot-icon rounded-circle me-3 d-flex align-items-center justify-content-center" 
-                 [ngClass]="bot.isToolEnabled ? 'bg-primary bg-opacity-25' : 'bg-secondary bg-opacity-25'"
+                 [ngClass]="{'bg-primary bg-opacity-25': bot.isToolEnabled, 'bg-secondary bg-opacity-25': !bot.isToolEnabled}"
                  style="width: 50px; height: 50px;">
-              <i class="bi" [ngClass]="bot.isToolEnabled ? 'bi-robot text-primary' : 'bi-cpu text-secondary'" style="font-size: 1.5rem;"></i>
+              <i class="bi" [ngClass]="{'bi-robot text-primary': bot.isToolEnabled, 'bi-cpu text-secondary': !bot.isToolEnabled}" style="font-size: 1.5rem;"></i>
             </div>
             <div>
               <h5 class="mb-0 text-light">{{ bot.name }}</h5>
@@ -212,10 +223,16 @@
         </div>
         <div class="card-footer bg-dark border-top border-secondary">
           <div class="d-flex justify-content-between">
-            <button class="btn btn-sm btn-outline-primary" title="Open Bot" (click)="openChatPopup(bot._id)">
+            <button class="btn btn-sm btn-outline-primary" title="Open Bot" (click)="openChatPopup(bot._id, false)">
               <i class="bi bi-chat-dots me-1"></i> Chat
             </button>
+            <button class="btn btn-sm btn-outline-primary" title="Open Bot with Voice" (click)="openChatPopup(bot._id, true)">
+              <i class="bi bi-volume-up me-1"></i> Voice
+            </button>
             <div>
+              <button class="btn btn-sm btn-outline-info me-2" title="Get Embed Script" (click)="openScriptPopup(bot._id)">
+                <i class="bi bi-code-slash"></i>
+              </button>
               <button class="btn btn-sm btn-outline-warning me-2" title="Edit Bot">
                 <i class="bi bi-pencil"></i>
               </button>
@@ -374,7 +391,7 @@
                 <i class="bi bi-x-lg me-1"></i>Cancel
               </button>
               <button type="submit" class="btn btn-primary btn-lg" [disabled]="botForm.invalid">
-                <i class="bi bi-robot me-2"></i>Deploy Bot
+                <i class="bi bi-robot me-2"></i>Create Bot
               </button>
             </div>
           </form>
@@ -411,7 +428,7 @@
       </div>
     </div>
     <div class="chat-popup-body">
-      <app-chat [botId]="chat.botId" [popupMode]="true"></app-chat>
+      <app-chat [botId]="chat.botId" [popupMode]="true" [voiceEnabled]="chat.voiceEnabled" [isMinimized]="chat.isMinimized"></app-chat>
     </div>
   </div>
 </div>
@@ -426,5 +443,51 @@
       <i class="bi bi-robot"></i>
     </div>
     <span class="ms-2">{{ chat.botName }}</span>
+  </div>
+</div>
+
+<!-- Script Popup Modal -->
+<div *ngIf="showScriptPopup" class="modal-overlay" style="z-index: 2000;">
+  <div class="modal-dialog">
+    <div class="modal-content bg-dark text-light border border-info rounded-3 shadow-lg position-relative overflow-hidden">
+      <!-- Neural network background pattern -->
+      <div class="position-absolute" style="top: 0; right: 0; bottom: 0; left: 0; opacity: 0.05; pointer-events: none;">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <pattern id="code-pattern" width="100" height="100" patternUnits="userSpaceOnUse">
+            <text x="0" y="20" fill="#0dcaf0" font-family="monospace" font-size="10">&lt;script&gt;</text>
+            <text x="20" y="40" fill="#0dcaf0" font-family="monospace" font-size="10">function()</text>
+            <text x="40" y="60" fill="#0dcaf0" font-family="monospace" font-size="10">{{'{return}'}}</text>
+            <text x="10" y="80" fill="#0dcaf0" font-family="monospace" font-size="10">&lt;/script&gt;</text>
+          </pattern>
+          <rect width="100%" height="100%" fill="url(#code-pattern)"></rect>
+        </svg>
+      </div>
+     
+      <div class="modal-header border-bottom border-info p-4">
+        <h3 class="modal-title d-flex align-items-center">
+          <i class="bi bi-code-slash me-2 text-info"></i>Embed Script
+        </h3>
+        <button type="button" class="btn-close btn-close-white" (click)="closeScriptPopup()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p class="text-light mb-3">Copy this script tag and paste it into your website's HTML to embed the chatbot:</p>
+       
+        <div class="code-container bg-black p-3 rounded-3 position-relative mb-4" style="max-height: 200px; overflow-y: auto;">
+          <pre class="text-light mb-0" style="white-space: pre-wrap;"><code>{{ scriptCode }}</code></pre>
+        </div>
+       
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-secondary small">
+            <i class="bi bi-info-circle me-1"></i>
+            The script will automatically initialize the chatbot on your website.
+          </div>
+          <button class="btn btn-info" (click)="copyScriptToClipboard()">
+            <i class="bi" [ngClass]="scriptCopied ? 'bi-check-lg' : 'bi-clipboard'"></i>
+            <span *ngIf="scriptCopied">Copied!</span>
+            <span *ngIf="!scriptCopied">Copy Code</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

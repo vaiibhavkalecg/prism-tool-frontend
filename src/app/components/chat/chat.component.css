@@ -141,11 +141,7 @@
   padding: 10px 15px;
 }
 
-.send-button {
-  width: 45px;
-}
-
-.voice-button {
+.send-button, .voice-button, .attachment-button {
   width: 45px;
   transition: all 0.3s ease;
 }
@@ -167,6 +163,57 @@
   100% {
     box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
   }
+}
+
+/* Selected files styling */
+.selected-files-container {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.selected-file {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  max-width: 200px;
+}
+
+.file-name {
+  max-width: 120px;
+  font-size: 0.85rem;
+}
+
+/* Attachments styling */
+.attachments-container {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+}
+
+.attachment-item {
+  transition: all 0.2s ease;
+}
+
+.attachment-item:hover {
+  transform: translateY(-2px);
+}
+
+.image-attachment img {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.image-attachment img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.document-attachment {
+  background-color: rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.document-attachment:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Popup mode adjustments */

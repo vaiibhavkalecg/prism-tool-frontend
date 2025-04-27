@@ -19,11 +19,56 @@
     <div *ngFor="let msg of messages; let i = index" @fadeIn class="message-row" [ngClass]="{'justify-content-end': msg.sender === 'user'}">
       <div class="message-bubble" [ngClass]="{'user-message': msg.sender === 'user', 'bot-message': msg.sender === 'bot'}">
         {{ msg.text }}
+        
+        <!-- Attachments section -->
+        <div class="attachments-container mt-2" *ngIf="msg.attachments && msg.attachments.length > 0">
+          <div class="attachments-list">
+            <div *ngFor="let attachment of msg.attachments" class="attachment-item mb-2">
+              <!-- Image attachments -->
+              <div *ngIf="isImageAttachment(attachment)" class="image-attachment">
+                <img [src]="attachment.url" [alt]="attachment.name" class="img-fluid rounded" style="max-height: 200px;">
+                <div class="mt-1">
+                  <a [href]="attachment.url" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-arrows-fullscreen me-1"></i> View
+                  </a>
+                  <a [href]="attachment.url" download [attr.download]="attachment.name" class="btn btn-sm btn-outline-primary ms-2">
+                    <i class="bi bi-download me-1"></i> Download
+                  </a>
+                </div>
+              </div>
+              
+              <!-- Document and other attachments -->
+              <div *ngIf="!isImageAttachment(attachment)" class="document-attachment d-flex align-items-center p-2 border rounded">
+                <i class="bi me-2 fs-4" [ngClass]="getAttachmentIcon(attachment)"></i>
+                <div class="flex-grow-1 text-truncate">{{ attachment.name }}</div>
+                <a [href]="attachment.url" target="_blank" class="btn btn-sm btn-outline-primary me-1" title="View">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a [href]="attachment.url" download [attr.download]="attachment.name" class="btn btn-sm btn-outline-primary" title="Download">
+                  <i class="bi bi-download"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div class="message-actions mt-2" *ngIf="msg.sender === 'bot'">
-          <div class="d-flex gap-2">
+          <div class="d-flex flex-wrap gap-2">
+            <!-- Single download link (backward compatibility) -->
             <button *ngIf="msg.downloadLink" class="btn btn-sm btn-primary download-btn" (click)="downloadFile(msg.downloadLink)">
-              <i class="bi bi-download me-1"></i> Download File
+              <i class="bi bi-download me-1"></i> {{ msg.downloadLinkLabels && msg.downloadLinkLabels[0] || 'Download File' }}
             </button>
+            
+            <!-- Multiple download links -->
+            <ng-container *ngIf="msg.downloadLinks && msg.downloadLinks.length > 0">
+              <button *ngFor="let link of msg.downloadLinks; let linkIndex = index" 
+                      class="btn btn-sm btn-primary download-btn" 
+                      (click)="downloadFile(link)">
+                <i class="bi bi-download me-1"></i> 
+                {{ msg.downloadLinkLabels && linkIndex < msg.downloadLinkLabels.length ? msg.downloadLinkLabels[linkIndex] : 'Download File' }}
+              </button>
+            </ng-container>
+            
             <button class="btn btn-sm btn-outline-light tts-btn" (click)="speakText(msg.text, i)" title="Listen to this message">
               <i class="bi" [ngClass]="isSpeaking && currentSpeakingIndex === i ? 'bi-volume-up-fill' : 'bi-volume-up'"></i>
             </button>
@@ -57,6 +102,20 @@
         autofocus
       />
       <button 
+        class="btn btn-outline-secondary attachment-button" 
+        type="button"
+        title="Add attachment"
+        (click)="fileInput.click()">
+        <i class="bi bi-paperclip"></i>
+      </button>
+      <input 
+        #fileInput 
+        type="file" 
+        style="display: none" 
+        (change)="handleFileInput($event)"
+        multiple
+      />
+      <button 
         class="btn btn-outline-secondary voice-button" 
         type="button" 
         (click)="toggleVoiceInput()"
@@ -64,9 +123,22 @@
         title="Voice input">
         <i class="bi" [ngClass]="isListening ? 'bi-mic-fill' : 'bi-mic'"></i>
       </button>
-      <button class="btn btn-primary send-button" type="submit" [disabled]="!message.trim() || isLoading">
+      <button class="btn btn-primary send-button" type="submit" [disabled]="!message.trim() && !selectedFiles.length || isLoading">
         <i class="bi bi-send-fill"></i>
       </button>
     </form>
+    
+    <!-- Selected files preview -->
+    <div *ngIf="selectedFiles.length > 0" class="selected-files-container mt-2">
+      <div class="d-flex flex-wrap gap-2">
+        <div *ngFor="let file of selectedFiles; let i = index" class="selected-file p-2 border rounded d-flex align-items-center">
+          <i class="bi me-2" [ngClass]="getFileIcon(file)"></i>
+          <span class="file-name text-truncate">{{ file.name }}</span>
+          <button class="btn btn-sm btn-link text-danger ms-2 p-0" (click)="removeSelectedFile(i)">
+            <i class="bi bi-x-circle"></i>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
