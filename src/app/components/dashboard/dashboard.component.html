@@ -23,9 +23,6 @@
         <button class="btn btn-outline-secondary me-2" title="Refresh" (click)="refreshDashboard()">
           <i class="bi bi-arrow-clockwise"></i>
         </button>
-        <button class="btn btn-outline-info me-2" title="Get Script" (click)="openDummyScriptPopup()">
-          <i class="bi bi-code-slash"></i>
-        </button>
         <button class="btn btn-primary me-2" title="Create Bot" (click)="openCreateBotPopup()">
           <i class="bi bi-plus-lg"></i>
         </button>
@@ -223,12 +220,14 @@
         </div>
         <div class="card-footer bg-dark border-top border-secondary">
           <div class="d-flex justify-content-between">
-            <button class="btn btn-sm btn-outline-primary" title="Open Bot" (click)="openChatPopup(bot._id, false)">
-              <i class="bi bi-chat-dots me-1"></i> Chat
-            </button>
-            <button class="btn btn-sm btn-outline-primary" title="Open Bot with Voice" (click)="openChatPopup(bot._id, true)">
-              <i class="bi bi-volume-up me-1"></i> Voice
-            </button>
+            <div>
+              <button class="btn btn-sm btn-outline-primary me-2" title="Open Bot" (click)="openChatPopup(bot._id, false)">
+                <i class="bi bi-chat-dots me-1"></i> Chat
+              </button>
+              <button class="btn btn-sm btn-outline-primary" title="Open Bot with Voice" (click)="openChatPopup(bot._id, true)">
+                <i class="bi bi-volume-up me-1"></i> Voice
+              </button>
+            </div>
             <div>
               <button class="btn btn-sm btn-outline-info me-2" title="Get Embed Script" (click)="openScriptPopup(bot._id)">
                 <i class="bi bi-code-slash"></i>
