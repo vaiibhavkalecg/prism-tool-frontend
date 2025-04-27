@@ -152,6 +152,10 @@
   color: white;
   animation: pulse 1.5s infinite;
 }
+.custom-textarea {
+  background-color: #2b3035;
+  color: #f8f9fa;
+}
 
 @keyframes pulse {
   0% {

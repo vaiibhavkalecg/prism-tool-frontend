@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, OnDestroy, SimpleChanges, NgZone } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, OnDestroy, SimpleChanges, NgZone, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -85,11 +85,13 @@ interface SpeechRecognitionAlternative {
   ]
 })
 
-export class ChatComponent implements OnInit, OnChanges, OnDestroy {
+export class ChatComponent implements OnInit, OnChanges, OnDestroy, AfterViewChecked {
   @Input() botId!: string;
   @Input() popupMode: boolean = false;
   @Input() voiceEnabled: boolean = false;
   @Input() isMinimized: boolean = false;
+  @ViewChild('chatBox') private chatBoxRef!: ElementRef;
+  private shouldScrollToBottom: boolean = false;
   message: string = '';
   messages: { 
     sender: 'user' | 'bot', 
@@ -168,6 +170,24 @@ export class ChatComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  ngAfterViewChecked() {
+    // Scroll to bottom if needed
+    if (this.shouldScrollToBottom) {
+      this.scrollToBottom();
+      this.shouldScrollToBottom = false;
+    }
+  }
+
+  // Method to scroll to the bottom of the chat box
+  scrollToBottom(): void {
+    try {
+      const chatBoxElement = this.chatBoxRef.nativeElement;
+      chatBoxElement.scrollTop = chatBoxElement.scrollHeight;
+    } catch (err) {
+      console.error('Error scrolling to bottom:', err);
+    }
+  }
+
   sendMessage() {
     if ((!this.message.trim() && this.selectedFiles.length === 0) || !this.botId) return;
 
@@ -198,6 +218,9 @@ export class ChatComponent implements OnInit, OnChanges, OnDestroy {
       // Just a text message
       this.messages.push({ sender: 'user', text: userMessageText });
     }
+    
+    // Trigger scroll to bottom after adding user message
+    this.shouldScrollToBottom = true;
     
     // Show loading state
     this.isLoading = true;
@@ -233,6 +256,9 @@ export class ChatComponent implements OnInit, OnChanges, OnDestroy {
         // Add the message to the chat
         this.messages.push(botMessage);
         
+        // Trigger scroll to bottom after adding bot message
+        this.shouldScrollToBottom = true;
+        
         // Automatically speak the response if voice is enabled
         if (this.voiceEnabled) {
           this.speakText(cleanText, this.messages.length - 1);
@@ -244,6 +270,9 @@ export class ChatComponent implements OnInit, OnChanges, OnDestroy {
         const errorMessage = 'Error: Could not fetch response.';
         this.messages.push({ sender: 'bot', text: errorMessage });
         this.isLoading = false;
+        
+        // Trigger scroll to bottom after adding error message
+        this.shouldScrollToBottom = true;
         
         // Speak the error message if voice is enabled
         if (this.voiceEnabled) {
@@ -479,6 +508,17 @@ export class ChatComponent implements OnInit, OnChanges, OnDestroy {
     
     // Speak the text
     this.speechSynthesis.speak(this.speechUtterance);
+  }
+
+  // Handle keydown events in the textarea
+  handleKeyDown(event: KeyboardEvent): void {
+    // If Enter is pressed without Shift key, send the message
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault(); // Prevent default behavior (new line)
+      this.sendMessage();
+    }
+    // If Shift+Enter is pressed, allow the default behavior (new line)
+    // No need to do anything as the default behavior will create a new line
   }
 
   // Clean up resources when component is destroyed

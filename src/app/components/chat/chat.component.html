@@ -15,7 +15,7 @@
   </div>
 
   <!-- Messages Area -->
-  <div class="chat-box flex-grow-1 overflow-auto p-3">
+  <div #chatBox class="chat-box flex-grow-1 overflow-auto p-3">
     <div *ngFor="let msg of messages; let i = index" @fadeIn class="message-row" [ngClass]="{'justify-content-end': msg.sender === 'user'}">
       <div class="message-bubble" [ngClass]="{'user-message': msg.sender === 'user', 'bot-message': msg.sender === 'bot'}">
         {{ msg.text }}
@@ -92,15 +92,17 @@
   <!-- Message Input -->
   <div class="chat-input p-3 border-top">
     <form (submit)="sendMessage()" class="input-group">
-      <input 
-        type="text" 
+      <textarea 
         [(ngModel)]="message" 
         name="message" 
-        class="form-control" 
+        class="form-control custom-textarea" 
         placeholder="Type your message..." 
         autocomplete="off"
         autofocus
-      />
+        rows="1"
+        style="min-height: 50px; max-height: 150px; resize: none; overflow-y: auto;"
+        (keydown)="handleKeyDown($event)"
+      ></textarea>
       <button 
         class="btn btn-outline-secondary attachment-button" 
         type="button"
