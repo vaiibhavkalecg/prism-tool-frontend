@@ -2,6 +2,7 @@ import { Component, Input, OnInit, OnChanges, OnDestroy, SimpleChanges, NgZone, 
 import { ActivatedRoute } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { SpeechifyService } from '../../services/speechify.service';
 
 // Add TypeScript interfaces for Web Speech API
 
@@ -110,7 +111,12 @@ export class ChatComponent implements OnInit, OnChanges, OnDestroy, AfterViewChe
   speechUtterance: SpeechSynthesisUtterance | null = null;
   selectedFiles: File[] = [];
 
-  constructor(private route: ActivatedRoute, private chatService: ChatService, private ngZone: NgZone) {}
+  constructor(
+    private route: ActivatedRoute, 
+    private chatService: ChatService, 
+    private ngZone: NgZone,
+    private speechifyService: SpeechifyService
+  ) {}
 
   ngOnInit(): void {
     // In popup mode, botId is passed as an @Input property
@@ -453,20 +459,15 @@ export class ChatComponent implements OnInit, OnChanges, OnDestroy, AfterViewChe
 
   // Method to stop any ongoing speech
   stopSpeech() {
-    if (this.speechSynthesis && this.isSpeaking) {
-      this.speechSynthesis.cancel();
+    if (this.isSpeaking) {
+      this.speechifyService.stop();
       this.isSpeaking = false;
       this.currentSpeakingIndex = -1;
     }
   }
 
-  // Method to speak text aloud
-  speakText(text: string, messageIndex: number = -1) {
-    if (!this.speechSynthesis) {
-      alert('Text-to-speech is not supported in your browser.');
-      return;
-    }
-
+  // Method to speak text aloud using Speechify
+  async speakText(text: string, messageIndex: number = -1) {
     // If already speaking, stop it
     if (this.isSpeaking) {
       this.stopSpeech();
@@ -477,37 +478,32 @@ export class ChatComponent implements OnInit, OnChanges, OnDestroy, AfterViewChe
       }
     }
 
-    // Create a new utterance
-    this.speechUtterance = new SpeechSynthesisUtterance(text);
-    this.speechUtterance.lang = 'en-US';
-    this.speechUtterance.rate = 1.0;
-    this.speechUtterance.pitch = 1.0;
-    
-    // Set event handlers
-    this.speechUtterance.onstart = () => {
+    try {
+      // Update UI state
+      this.isSpeaking = true;
+      this.currentSpeakingIndex = messageIndex;
+      
+      // Use the Speechify service to speak the text
+      await this.speechifyService.speak(text);
+      
+      // Handle completion event
       this.ngZone.run(() => {
-        this.isSpeaking = true;
-        this.currentSpeakingIndex = messageIndex;
+        // Listen for the audio element's ended event
+        const checkPlaybackStatus = setInterval(() => {
+          if (!this.speechifyService.isPlaying()) {
+            clearInterval(checkPlaybackStatus);
+            this.isSpeaking = false;
+            this.currentSpeakingIndex = -1;
+          }
+        }, 500);
       });
-    };
-    
-    this.speechUtterance.onend = () => {
-      this.ngZone.run(() => {
-        this.isSpeaking = false;
-        this.currentSpeakingIndex = -1;
-      });
-    };
-    
-    this.speechUtterance.onerror = (event) => {
-      console.error('Speech synthesis error:', event);
+    } catch (error) {
+      console.error('Error using Speechify TTS:', error);
       this.ngZone.run(() => {
         this.isSpeaking = false;
         this.currentSpeakingIndex = -1;
       });
-    };
-    
-    // Speak the text
-    this.speechSynthesis.speak(this.speechUtterance);
+    }
   }
 
   // Handle keydown events in the textarea

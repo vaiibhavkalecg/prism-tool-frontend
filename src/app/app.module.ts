@@ -14,6 +14,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { AuthInterceptor } from './auth.interceptor';
 import { ChatComponent } from './components/chat/chat.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { SpeechifyService } from './services/speechify.service';
 
 @NgModule({
   declarations: [
@@ -22,8 +23,8 @@ import { FooterComponent } from './components/footer/footer.component';
     RegisterComponent,
     DashboardComponent,
     ForgotPasswordComponent,
-    ChatComponent,
-    FooterComponent
+    FooterComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,
@@ -35,11 +36,12 @@ import { FooterComponent } from './components/footer/footer.component';
     FormsModule,
   ],
   providers: [
+    // SpeechifyService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    }
+    },
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
