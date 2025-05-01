@@ -121,7 +121,7 @@ export class ChatComponent implements OnInit, OnChanges, OnDestroy, AfterViewChe
     
     // Initialize with a welcome message
     if (this.botId) {
-      const welcomeMessage = 'Hello! I am Steve, How can I assist you today?';
+      const welcomeMessage = 'Hello! I am Vaibhav, How can I assist you today?';
       this.messages.push({ sender: 'bot', text: welcomeMessage });
       
       // If voice is enabled, speak the welcome message
@@ -141,7 +141,7 @@ export class ChatComponent implements OnInit, OnChanges, OnDestroy, AfterViewChe
     // Reset messages when botId changes in popup mode
     if (changes['botId'] && !changes['botId'].firstChange && this.popupMode) {
       this.messages = [];
-      const welcomeMessage = 'Hello! I am Steve, How can I assist you today?';
+      const welcomeMessage = 'Hello! I am Vaibhav, How can I assist you today?';
       this.messages.push({ sender: 'bot', text: welcomeMessage });
       
       // If voice is enabled, speak the welcome message
